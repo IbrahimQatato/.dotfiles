@@ -3,9 +3,9 @@ DIR=/home/ibra/.config/hypr/
 FILE=HYPR_IS_LAPTOP.env
 
 if hyprctl monitors | grep -q "eDP-1"; then
-    echo "env = HYPR_IS_LAPTOP,true" > "${DIR}${FILE}"
+    echo "$HYPR_IS_LAPTOP=True" > "${DIR}${FILE}"
 else
-    echo "env = HYPR_IS_LAPTOP,false" > "${DIR}${FILE}"
+    echo "$HYPR_IS_LAPTOP=False" > "${DIR}${FILE}"
 
 fi
 
