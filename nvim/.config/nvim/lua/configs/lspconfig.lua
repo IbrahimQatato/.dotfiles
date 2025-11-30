@@ -5,7 +5,7 @@ local lspconfig = require "lspconfig"
 local util = require "lspconfig.util"
 
 -- EXAMPLE
-local servers = { "html", "cssls", "clangd", "pylsp", "prolog_ls", "hls", }
+local servers = { "html", "cssls", "clangd", "pylsp", "prolog_ls", "hls" }
 local nvlsp = require "nvchad.configs.lspconfig"
 
 -- lsps with default config
@@ -23,6 +23,15 @@ end
 --   on_init = nvlsp.on_init,
 --   capabilities = nvlsp.capabilities,
 -- }
+
+lspconfig.clangd.setup {
+  on_attach = nvlsp.on_attach,
+  on_init = nvlsp.on_init,
+  capabilities = nvlsp.capabilities,
+  init_options = {
+    fallbackFlags = { "--std=c++20" },
+  },
+}
 
 lspconfig.pylsp.setup {
   on_attach = nvlsp.on_attach,
@@ -71,4 +80,3 @@ lspconfig.prolog_ls.setup {
     return util.path.dirname(fname)
   end,
 }
-
