@@ -1,7 +1,7 @@
 -- load defaults i.e lua_lsp
 require("nvchad.configs.lspconfig").defaults()
 
-local lspconfig = require "lspconfig"
+local lspconfig = vim.lsp.config
 local util = require "lspconfig.util"
 
 -- EXAMPLE
@@ -9,13 +9,14 @@ local servers = { "html", "cssls", "clangd", "pylsp", "prolog_ls", "hls" }
 local nvlsp = require "nvchad.configs.lspconfig"
 
 -- lsps with default config
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = nvlsp.on_attach,
-    on_init = nvlsp.on_init,
-    capabilities = nvlsp.capabilities,
-  }
-end
+-- for _, lsp in ipairs(servers) do
+--   lspconfig[lsp].setup {
+--     on_attach = nvlsp.on_attach,
+--     on_init = nvlsp.on_init,
+--     capabilities = nvlsp.capabilities,
+--   }
+-- end
+
 
 -- configuring single server, example: typescript
 -- lspconfig.ts_ls.setup {
@@ -24,7 +25,7 @@ end
 --   capabilities = nvlsp.capabilities,
 -- }
 
-lspconfig.clangd.setup {
+lspconfig.clangd = {
   on_attach = nvlsp.on_attach,
   on_init = nvlsp.on_init,
   capabilities = nvlsp.capabilities,
@@ -33,7 +34,7 @@ lspconfig.clangd.setup {
   },
 }
 
-lspconfig.pylsp.setup {
+lspconfig.pylsp = {
   on_attach = nvlsp.on_attach,
   on_init = nvlsp.on_init,
   capabilities = nvlsp.capabilities,
@@ -49,7 +50,7 @@ lspconfig.pylsp.setup {
   },
 }
 
-lspconfig.prolog_ls.setup {
+lspconfig.prolog_ls = {
   -- If you’re using the NvChad pattern, adapt accordingly
   on_attach = nvlsp.on_attach,
   on_init = nvlsp.on_init,
@@ -80,3 +81,5 @@ lspconfig.prolog_ls.setup {
     return util.path.dirname(fname)
   end,
 }
+
+vim.lsp.enable(servers)
