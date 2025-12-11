@@ -1,5 +1,5 @@
-# BEGIN_KITTY_THEME
-# Gruvbox Material Dark Soft
+# BEGIN_KITTY_THEM
+# One Dark
 include current-theme.conf
 # END_KITTY_THEME
 
@@ -10,12 +10,22 @@ italic_font      auto
 bold_italic_font auto
 # END_KITTY_FONTS
 
-#shell type
 shell zsh
+
+enable_audio_bell yes
+
+#bell_path = "/usr/share/sounds/gnome/default/alerts/string.oga"
+
+bell_command = "canberra-gtk-play -f /usr/share/sounds/gnome/default/alerts/string.oga"
+
+
+
+bell_on_tab "🔔 "
 
 tab_bar_style powerline
 
 map ctrl+shift+t new_tab_with_cwd
 map ctrl+shift+enter new_window_with_cwd
+
 
 background_opacity 0.8
