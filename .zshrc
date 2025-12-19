@@ -15,14 +15,13 @@ compinit
 #for starship
 eval "$(starship init zsh)"
 
-alias l="ls"
+alias l="ls -a"
 alias la="ls -a"
 alias open="xdg-open"
 
 export PATH="$HOME/bin:$PATH"
 
 EDITOR="nvim"
-
 
 export PATH=$PATH:~/.local/share/jdtls/bin/
 
@@ -33,3 +32,4 @@ alias disl="${HOME}/projects/disl/bin/disl.py"
 # env variable for disl.py to work without having to specify directory with -d
 export DISL_HOME="${HOME}/projects/disl/"
 
+bindkey '^?' backward-delete-char
