@@ -95,6 +95,22 @@ return {
       -- return conf
     end,
   },
+  {
+    "karb94/neoscroll.nvim",
+    -- lazy = false,
+    -- event = "WinScrolled",
+    event = "VeryLazy", -- Loads slightly after startup, won't slow down opening files
+    config = function()
+      require("neoscroll").setup {
+        mappings = { "<C-u>", "<C-d>", "<C-b>", "<C-f>", "zt", "zz", "zb" },
+        hide_cursor = true,
+        stop_eof = true,
+        respect_scrolloff = false,
+        cursor_scrolls_alone = true,
+        easing = "quadratic",
+      }
+    end,
+  },
   --which to use?
   -- {
   --   "hrsh7th/nvim-cmp",
