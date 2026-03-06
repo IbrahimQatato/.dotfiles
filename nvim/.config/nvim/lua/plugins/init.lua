@@ -111,6 +111,100 @@ return {
       }
     end,
   },
+  {
+    "mfussenegger/nvim-dap",
+    ft = "python",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "rcarriga/nvim-dap-ui",
+      "mfussenegger/nvim-dap-python",
+      "theHamsta/nvim-dap-virtual-text",
+    },
+    opts = {
+      ensure_installed = { "debugpy" }, -- Add more here, like "cppdbg" for C++
+    },
+    config = function()
+      local dap = require "dap"
+      local dapui = require "dapui"
+      local dap_python = require "dap-python"
+
+      require("dapui").setup {}
+      require("nvim-dap-virtual-text").setup {
+        commented = true, -- Show virtual text alongside comment
+      }
+
+      local mason_path = vim.fn.stdpath "data" .. "/mason/packages/debugpy/venv/bin/python"
+      dap_python.setup(mason_path)
+      -- dap_python.setup "python3"
+
+      -- Override the default python configuration
+      dap.configurations.python = {
+        {
+          type = "python",
+          request = "launch",
+          name = "Launch file (Dynamic)",
+          program = "${file}",
+          -- Best Practice: Use the currently active venv if it exists,
+          -- otherwise fall back to system python
+          -- pythonPath = function()
+          --   local venv_path = os.getenv "VIRTUAL_ENV"
+          --   if venv_path then
+          --     return venv_path .. "/bin/python"
+          --   end
+          --   return "/usr/bin/python3"
+          -- end,
+          console = "internalConsole",
+        },
+      }
+
+      vim.fn.sign_define("DapBreakpoint", {
+        text = "",
+        texthl = "DiagnosticSignError",
+        linehl = "",
+        numhl = "",
+      })
+
+      vim.fn.sign_define("DapBreakpointRejected", {
+        text = "", -- or "❌"
+        texthl = "DiagnosticSignError",
+        linehl = "",
+        numhl = "",
+      })
+
+      vim.fn.sign_define("DapStopped", {
+        text = "", -- or "→"
+        texthl = "DiagnosticSignWarn",
+        linehl = "Visual",
+        numhl = "DiagnosticSignWarn",
+      })
+
+      -- Automatically open/close DAP UI
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open()
+      end
+
+      -- Toggle breakpoint
+      vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Debug: Toggle Breakpoint", silent = true })
+
+      -- Continue / Start
+      vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "Debug: Start/Continue", silent = true })
+
+      -- Step Over
+      vim.keymap.set("n", "<leader>do", dap.step_over, { desc = "Debug: Step Over", silent = true })
+
+      -- Step Into
+      vim.keymap.set("n", "<leader>di", dap.step_into, { desc = "Debug: Step Into", silent = true })
+
+      -- Step Out
+      vim.keymap.set("n", "<leader>dO", dap.step_out, { desc = "Debug: Step Out", silent = true })
+
+      -- Keymap to terminate debugging
+      vim.keymap.set("n", "<leader>dq", require("dap").terminate, { desc = "Debug: Quit", silent = true })
+
+      -- Toggle DAP UI
+      vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Debug: Toggle UI", silent = true })
+    end,
+  },
   --which to use?
   -- {
   --   "hrsh7th/nvim-cmp",
