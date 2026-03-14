@@ -18,8 +18,6 @@ local enable_providers = {
 
 
 -- Set local options
-vim.opt.spell = true
-vim.opt.spelllang = { 'en_gb' }
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "jsonc",
