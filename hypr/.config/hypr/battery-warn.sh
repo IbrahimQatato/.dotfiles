@@ -1,6 +1,6 @@
 #!/bin/sh
 while true; do
-  batter=$(upower --dump | grep -E percentage | awk '{print $2}' | tr -d '%' | head -n 1)
+  battery=$(upower --dump | grep -E percentage | awk '{print $2}' | tr -d '%' | head -n 1)
 
   if [ "$battery" -le "20" ]; then
     # hyprctl notify 0 5000 0 "  Low battery: ${battery}%" 
