@@ -7,6 +7,7 @@ while true; do
     # Send a styled notification to SwayNC
     # -u critical: Highlights it in red (usually) and keeps it on screen
     # -h int:value: Tells SwayNC to render a progress bar
+    paplay ./toink.mp3
     notify-send -u critical \
         -h string:x-canonical-private-synchronous:battery_low \
         -h int:value:"$battery" \
