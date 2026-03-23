@@ -11,7 +11,7 @@ else
 fi
 
 if [[ "$HYPR_IS_LAPTOP" == "True" ]]; then
-  paplay ~/.dotfiles/hypr/.config/hypr/gameboy_on.mp3
+  ~/.dotfiles/hypr/.config/hypr/playsound.sh ~/.dotfiles/hypr/.config/hypr/gameboy_on.mp3
 else
-  paplay ~/.dotfiles/hypr/.config/hypr/game_start.ogg
+  ~/.dotfiles/hypr/.config/hypr/playsound.sh ~/.dotfiles/hypr/.config/hypr/game_start.ogg
 fi
