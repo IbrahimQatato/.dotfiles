@@ -205,6 +205,28 @@ return {
       vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Debug: Toggle UI", silent = true })
     end,
   },
+  -- cppman
+  {
+    "madskjeldgaard/cppman.nvim",
+    dependencies = {
+      { "MunifTanjim/nui.nvim" },
+    },
+    ft="cpp",
+    config = function()
+      local cppman = require "cppman"
+      cppman.setup()
+
+      -- Make a keymap to open the word under cursor in CPPman
+      vim.keymap.set("n", "<leader>ci", function()
+        cppman.open_cppman_for(vim.fn.expand "<cword>")
+      end, { desc = "CPPMan: Search word under cursor" })
+
+      -- Open search box
+      vim.keymap.set("n", "<leader>cc", function()
+        cppman.input()
+      end, { desc = "CPPMan: Open search box" })
+    end,
+  },
   --which to use?
   -- {
   --   "hrsh7th/nvim-cmp",
