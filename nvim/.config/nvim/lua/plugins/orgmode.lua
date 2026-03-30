@@ -1,12 +1,19 @@
 return {
-  'nvim-orgmode/orgmode',
-  event = 'VeryLazy',
+  "nvim-orgmode/orgmode",
+  event = "VeryLazy",
   config = function()
-    require('orgmode').setup({
-      org_agenda_files = '~/orgfiles/**/*',
-      org_default_notes_file = '~/orgfiles/refile.org',
-    })
-   -- Experimental LSP support
-   vim.lsp.enable('org')
+    require("orgmode").setup {
+      org_agenda_files = "~/orgfiles/**/*",
+      org_default_notes_file = "~/orgfiles/refile.org",
+      org_capture_templates = {
+        r = {
+          description = "Repo",
+          template = "* [[%x][%(return string.match('%x', '([^/]+)$'))]]%?",
+          target = "~/orgfiles/repos.org",
+        },
+      },
+    }
+    -- Experimental LSP support
+    vim.lsp.enable "org"
   end,
 }
