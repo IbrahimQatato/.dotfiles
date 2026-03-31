@@ -1,6 +1,9 @@
 return {
   "nvim-orgmode/orgmode",
   event = "VeryLazy",
+  dependencies = {
+    "nvim-orgmode/org-bullets.nvim",
+  },
   config = function()
     require("orgmode").setup {
       org_agenda_files = "~/orgfiles/**",
@@ -33,5 +36,21 @@ return {
     }
     -- Experimental LSP support
     vim.lsp.enable "org"
+    require("org-bullets").setup {
+      symbols = {
+        checkboxes = {
+          done = { "✓", "@org.checkbox.checked" }, -- use checkbox color, not keyword color
+          half = { "", "@org.checkbox.halfchecked" },
+          todo = { "˟", "@org.checkbox" },
+        },
+      },
+    }
+    -- for brighter Done marks
+    -- vim.api.nvim_create_autocmd("ColorScheme", {
+    --   pattern = "*",
+    --   callback = function()
+    --     vim.api.nvim_set_hl(0, "@org.keyword.done", { link = "DiagnosticOk" })
+    --   end,
+    -- })
   end,
 }
