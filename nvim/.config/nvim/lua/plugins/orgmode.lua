@@ -21,8 +21,8 @@ return {
         },
       },
       -- org_agenda_use_time_grid = true,
-      -- org_agenda_span = "week", -- OR set to a number like 3 to see today + 2 days
-      -- org_agenda_start_on_weekday = false, -- Starts the 'week' view on Today
+      org_agenda_span = "day", -- OR set to a number like 3 to see today + 2 days
+      org_agenda_start_on_weekday = false, -- Starts the 'week' view on Today
       --
     }
 
@@ -32,7 +32,7 @@ return {
     --     vim.api.nvim_set_hl(0, "@org.agenda.scheduled", { link = "@comment.warning" })
     --   end,
     -- })
-    vim.api.nvim_set_hl(0, "@org.agenda.scheduled", { link = "@comment.warning" })
+    vim.api.nvim_set_hl(0, "@org.agenda.scheduled", { link = "Normal" })
     -- Experimental LSP support
     vim.lsp.enable "org"
     require("org-bullets").setup {
