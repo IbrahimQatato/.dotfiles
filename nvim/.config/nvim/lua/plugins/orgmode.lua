@@ -8,6 +8,13 @@ return {
     require("orgmode").setup {
       org_agenda_files = "~/orgfiles/**",
       org_default_notes_file = "~/orgfiles/refile.org",
+      org_todo_keywords = { "TODO(t)", "DOING(p)", "|", "DONE(d)", "REJECTED(r)" },
+      org_todo_keyword_faces = {
+        PROGRESS = "foreground orange",
+        -- PROGRESS = {link = "@comment.todo"},
+        -- PROGRESS = ":foreground " .. get_hl_color "@comment.todo" .. " :weight bold",
+        -- PROGRESS = ":foreground #00afff :weight bold",
+      },
       org_capture_templates = {
         r = {
           description = "Repo",
