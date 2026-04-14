@@ -1,247 +1,99 @@
 * {
-  border: none;
-  border-radius: 8;
-  font-family: "Hack Nerd Font";
-  font-size: 16px;
-  min-height: 20px;
+    border: none;
+    border-radius: 0;
+    font-family: mononoki Nerd Font Mono;
+    font-size: 13px;
+    min-height: 0;
 }
+
+@import "gruvbox.css";
 
 window#waybar {
-  background: transparent;
-}
-
-window#waybar.hidden {
-  opacity: 0.2;
-}
-
-#window {
-  margin-top: 6px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 10px;
-  transition: none;
-  color: transparent;
-  background: transparent;
-}
-
-#workspaces {
-  margin-top: 6px;
-  margin-left: 12px;
-  font-size: 20px;
-  font-weight: 500;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  background: #282828;
-  /* default: background: #161320; */
-  transition: none;
+    background: rgba(40, 40, 40, 1);
+    border-bottom: 3px solid rgba(69, 133, 136, 1);
+    color: @white_b;
 }
 
 #workspaces button {
-  transition: none;
-  color: #fbf1c7;
-  /* default: color: #b5e8e0; */
-  background: transparent;
-  border-radius: 2px;
+    padding: 0 5px;
+    background: transparent;
+    color: @white_b;
+    border-bottom: 3px solid transparent;
 }
 
-#workspaces button.active {
-  color: #fe8019;
+#workspaces button.focused {
+    background: @blue;
+    border-bottom: 3px solid @blue;
 }
 
-#workspaces button:hover {
-  transition: none;
-  box-shadow: inherit;
-  text-shadow: inherit;
-  color: #d65d0e;
-  border-color: #d65d0e;
-  /* border-color: #e8a2af; */
-  /* color: #e8a2af; */
+#mode, #clock, #battery {
+    padding: 0 10px;
+    margin: 0 5px;
 }
 
-#network {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #fb4934;
-  /*default: background: #bd93f9;*/
-}
-
-#wireplumber {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #1a1826;
-  background: #fae3b0;
-}
-
-#temperature {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #1a1826;
-  background: #fae3b0;
-}
-#pulseaudio {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #b5e8e0;
-}
-
-#battery {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #b5e8e0;
-}
-
-#battery.critical:not(.charging) {
-  background-color: #b5e8e0;
-  color: #161320;
-  animation-name: blink;
-  animation-duration: 1s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-}
-
-@keyframes blink {
-  to {
-    background-color: #bf616a;
-    color: #b5e8e0;
-  }
-}
-
-#idle_inhibitor{
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #f8bd96;
-}
-#backlight {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #f8bd96;
+#mode {
+    background: @red;
+    border-bottom: 3px solid @white_b;
 }
 
 #clock {
-  margin-top: 6px;
-  margin-left: 8px;
-  margin-right: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #8ec07c;
-  /*default: background: #abe9b3; */
+    background-color: @orange_b;
+    color: @white_b;
 }
 
-#memory {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  margin-bottom: 0px;
-  padding-right: 10px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #fabd2f;
-  /*default: background: #ddb6f2; */
+#battery {
+    background-color: @white_b;
+    color: @background;
 }
 
-#cpu {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  margin-bottom: 0px;
-  padding-right: 10px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #b8bb26;
-  /*default: background: #96cdfb; */
+#battery.charging {
+    color: @background;
+    background-color: @green;
 }
 
-#custom-launcher {
-  font-size: 24px;
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 5px;
-  border-radius: 10px;
-  transition: none;
-  color: #fe8019;
-  /*default: color: #89dceb; */
-  background: #161320;
-}
-#custom-power {
-  font-size: 24px;
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 5px;
-  border-radius: 10px;
-  transition: none;
-  color: #fe8019;
-  /*default: color: #89dceb; */
-  background: #161320;
+@keyframes blink {
+    to {
+        background-color: @white_b;
+        color: @background;
+    }
 }
 
-#custom-media {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #f2cdcd;
+#idle_inhibitor, #pulseaudio, #custom-openvpn, #network, #cpu, #memory, #temperature, #backlight, #battery, #clock, #tray {
+     padding: 0 6px;
+     margin: 0 3px;
 }
-#tray {
-  margin-top: 6px;
-  margin-left: 8px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 0px;
-  border-radius: 10px;
-  transition: none;
-  color: #161320;
-  background: #f2cdcd;
+
+#battery.warning:not(.charging) {
+    background: @red;
+    color: @white_b;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+/* ======================= */
+/* Normal workspace */
+#workspaces button {
+    padding: 0 8px;
+    color: @foreground;
+}
+
+/* The workspace you're currently on */
+#workspaces button.active {
+    background: @blue;
+    color: @yellow;
+}
+
+/* 🚨 This is your "alert" style — fires when something opens in another workspace */
+#workspaces button.urgent {
+    background: @red;
+    color: @background;
+    animation: blink 0.5s linear infinite alternate;
+}
+
+@keyframes blink {
+    from { opacity: 1; }
+    to   { opacity: 0.4; }
 }
