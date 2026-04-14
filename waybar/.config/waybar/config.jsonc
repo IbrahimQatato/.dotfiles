@@ -19,7 +19,13 @@
         "org.telegram.desktop": "",
         "org.mozilla.firefox": "",
         "nautilus": "",
-        "spotify": ""
+        "spotify": "",
+        "sioyek": "",
+        "blueman-manager" : "",
+        "org.gnome.Weather" :"󰼰",
+        "com.rafaelmardojai.Blanket" :"󰗅",
+        "org.signal.Signal" :"",
+        "steam":"󰌦"
     }
 },
     "hyprland/submap": {
