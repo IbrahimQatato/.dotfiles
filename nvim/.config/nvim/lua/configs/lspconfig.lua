@@ -30,7 +30,7 @@ lspconfig.clangd = {
   on_init = nvlsp.on_init,
   capabilities = nvlsp.capabilities,
   init_options = {
-    fallbackFlags = { "--std=c++20" },
+    fallbackFlags = { "--std=c++23" },
   },
 }
 
