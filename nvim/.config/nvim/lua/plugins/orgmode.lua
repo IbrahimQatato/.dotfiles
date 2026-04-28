@@ -25,6 +25,8 @@ return {
       mappings = {
         org = {
           -- org_toggle_checkbox = "<C-Space>",
+          org_cycle = "<M-j>",
+          org_global_cycle = "<M-k>",
         },
       },
       -- org_agenda_use_time_grid = true,
@@ -46,7 +48,7 @@ return {
       symbols = {
         checkboxes = {
           done = { "✓", "@org.checkbox.checked" }, -- use checkbox color, not keyword color
-          half = { "", "@org.checkbox.halfchecked" },
+          half = { "-", "@org.checkbox.halfchecked" },
           todo = { "˟", "@org.checkbox" },
         },
       },
