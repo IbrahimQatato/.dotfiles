@@ -11,6 +11,7 @@ return {
       org_todo_keywords = { "TODO(t)", "DOING(p)", "|", "DONE(d)", "REJECTED(r)" },
       org_todo_keyword_faces = {
         PROGRESS = "foreground orange",
+        DONE = "foreground green",
         -- PROGRESS = {link = "@comment.todo"},
         -- PROGRESS = ":foreground " .. get_hl_color "@comment.todo" .. " :weight bold",
         -- PROGRESS = ":foreground #00afff :weight bold",
