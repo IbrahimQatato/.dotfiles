@@ -46,3 +46,4 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     vim.bo.filetype = "prolog"
   end,
 })
+require("autocmds")
