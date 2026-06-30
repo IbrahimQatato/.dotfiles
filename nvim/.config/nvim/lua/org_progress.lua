@@ -37,8 +37,9 @@ local cfg = {
 
 -- ── embedded Python parser ────────────────────────────────────────────────────
 -- Emits an ordered list of top-level items. Each item aggregates the task
--- keywords of all its descendants, and carries a list of branches (its
--- level-2 children) that each aggregate their own descendants.
+-- keywords *and plain-list checkbox items* (- [ ] / - [X] / - [-]) of all its
+-- descendants, and carries a list of branches (its level-2 children) that each
+-- aggregate their own descendants.
 --   [ { "name", done, todo, in_progress,
 --       branches: [ { "name", done, todo, in_progress }, ... ] }, ... ]
 local PARSER_PY = [[
@@ -60,6 +61,11 @@ def add_kw(node, kw):
     if kw in DONE: node["done"] += 1
     elif kw in PROG: node["in_progress"] += 1
     elif kw in TODO: node["todo"] += 1
+def add_cb(node, ch):
+    # org checkbox state: [X]/[x] done, [-] partial, [ ] not done
+    if ch in ('x', 'X'): node["done"] += 1
+    elif ch == '-': node["in_progress"] += 1
+    else: node["todo"] += 1
 def parse(path):
     try:
         lines = open(path, encoding='utf-8', errors='replace').read().splitlines()
@@ -67,10 +73,19 @@ def parse(path):
         print(f"ERROR: {e}", file=sys.stderr)
         return []
     hre = re.compile(r'^(\*+)\s+(.*)$')
+    # plain-list checkbox items: bullet (-, +, or N. / N)) followed by [ ], [X], [-]
+    cbre = re.compile(r'^\s*(?:[-+]|\d+[.)])\s+\[([ xX-])\]')
     tops, cur_top, cur_branch = [], None, None
     for line in lines:
         m = hre.match(line)
-        if not m: continue
+        if not m:
+            cm = cbre.match(line)
+            if cm and cur_top is not None:
+                ch = cm.group(1)
+                add_cb(cur_top, ch)
+                if cur_branch is not None:
+                    add_cb(cur_branch, ch)
+            continue
         lvl = len(m.group(1))
         rest = m.group(2)
         kw = ''
