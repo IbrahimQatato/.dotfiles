@@ -113,7 +113,7 @@ return {
   },
   {
     "mfussenegger/nvim-dap",
-    ft = "python",
+    ft = { "python", "c", "cpp" },
     dependencies = {
       "nvim-neotest/nvim-nio",
       "rcarriga/nvim-dap-ui",
@@ -156,6 +156,57 @@ return {
           console = "internalConsole",
         },
       }
+
+      -- C / C++ via GDB's built-in DAP server (gdb >= 14, no extra adapter needed)
+      -- Load the program up front so breakpoints resolve instead of going "pending"
+      dap.adapters.gdb = function(callback, config)
+        local args = { "--interpreter=dap", "--eval-command", "set print pretty on" }
+        if config.request == "launch" and type(config.program) == "string" then
+          table.insert(args, config.program)
+        end
+        callback { type = "executable", command = "gdb", args = args }
+      end
+
+      dap.configurations.c = {
+        {
+          name = "Build & debug current file",
+          type = "gdb",
+          request = "launch",
+          program = function()
+            local src = vim.fn.expand "%:p"
+            local out = vim.fn.expand "%:p:r"
+            local cc = vim.bo.filetype == "cpp" and "g++" or "gcc"
+            local res = vim.system({ cc, "-g", "-O0", "-Wall", src, "-o", out }):wait()
+            if res.code ~= 0 then
+              vim.notify(res.stderr, vim.log.levels.ERROR)
+              return dap.ABORT
+            end
+            return out
+          end,
+          cwd = "${workspaceFolder}",
+          stopAtBeginningOfMainSubprogram = false,
+        },
+        {
+          name = "Launch executable",
+          type = "gdb",
+          request = "launch",
+          program = function()
+            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+          end,
+          args = function()
+            return vim.split(vim.fn.input "Args: ", " ", { trimempty = true })
+          end,
+          cwd = "${workspaceFolder}",
+          stopAtBeginningOfMainSubprogram = false,
+        },
+        {
+          name = "Attach to process",
+          type = "gdb",
+          request = "attach",
+          pid = require("dap.utils").pick_process,
+        },
+      }
+      dap.configurations.cpp = dap.configurations.c
 
       vim.fn.sign_define("DapBreakpoint", {
         text = "",

@@ -1,0 +1,2 @@
+consider adding codellb
+ Programs that read keyboard input (scanf, std::cin) are awkward with GDB's debug-adapter mode. If that becomes a problem, install codelldb through Mason and add it as a second adapter. It can run your program in a real terminal.
