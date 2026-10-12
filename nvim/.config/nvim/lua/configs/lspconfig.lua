@@ -17,7 +17,6 @@ local nvlsp = require "nvchad.configs.lspconfig"
 --   }
 -- end
 
-
 -- configuring single server, example: typescript
 -- lspconfig.ts_ls.setup {
 --   on_attach = nvlsp.on_attach,
@@ -80,6 +79,21 @@ lspconfig.prolog_ls = {
     -- 2) Fallback to the file’s directory
     return util.path.dirname(fname)
   end,
+}
+
+lspconfig.roslyn = {
+  on_attach = nvlsp.on_attach,
+  on_init = nvlsp.on_init,
+  capabilities = nvlsp.capabilities,
+  settings = {
+    ["csharp|inlay_hints"] = {
+      csharp_enable_inlay_hints_for_implicit_object_creation = true,
+      csharp_enable_inlay_hints_for_types = true,
+    },
+    ["csharp|code_lens"] = {
+      dotnet_enable_references_code_lens = true,
+    },
+  },
 }
 
 vim.lsp.enable(servers)

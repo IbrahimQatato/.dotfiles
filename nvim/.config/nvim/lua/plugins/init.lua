@@ -38,6 +38,10 @@ return {
   {
     "williamboman/mason.nvim",
     opts = function(_, conf)
+      conf.registries = {
+        "github:mason-org/mason-registry",
+        "github:Crashdummyy/mason-registry",
+      }
       return conf
     end,
   },
