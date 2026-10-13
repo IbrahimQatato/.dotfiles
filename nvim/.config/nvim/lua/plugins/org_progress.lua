@@ -15,6 +15,9 @@ return {
         name_width = 18,
         interval   = 15,
       })
+      vim.keymap.set("n", "<leader>op", function()
+        require("org_progress").toggle()
+      end, { desc = "Toggle org progress overlay" })
     end,
   },
 }

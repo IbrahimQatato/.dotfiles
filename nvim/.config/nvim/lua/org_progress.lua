@@ -12,6 +12,7 @@ local timer   = nil
 local last_data = nil
 local float_win  = nil   -- the floating window handle
 local float_buf  = nil   -- the scratch buffer we draw into
+local visible    = true  -- toggled by M.toggle()
 
 local cfg = {
   bar_width  = 10,
@@ -281,7 +282,7 @@ local function open_or_update_float(lines, hls)
 end
 
 local function render()
-  if not last_data then return end
+  if not visible or not last_data then return end
   local lines, hls = build_content(last_data)
   open_or_update_float(lines, hls)
 end
@@ -325,6 +326,16 @@ local function is_org_buf(buf)
   if vim.bo[buf].filetype == "org" then return true end
   local name = vim.api.nvim_buf_get_name(buf)
   return name:match("%.org$") ~= nil
+end
+
+-- ── toggle ────────────────────────────────────────────────────────────────────
+function M.toggle()
+  visible = not visible
+  if not visible then
+    close_float()
+  elseif is_org_buf(0) then
+    refresh(vim.api.nvim_buf_get_name(0))
+  end
 end
 
 -- ── setup ─────────────────────────────────────────────────────────────────────
