@@ -65,7 +65,8 @@ return {
       if not winid then vim.lsp.buf.hover() end
     end, { desc = "Peek fold / LSP hover" })
 
-    -- Save and restore folds between sessions
+    -- Save and restore folds between sessions (no curdir, or views replay a stale :lcd)
+    vim.opt.viewoptions = { "folds", "cursor" }
     local save_fold = vim.api.nvim_create_augroup("SaveFold", { clear = true })
     vim.api.nvim_create_autocmd("BufWinLeave", {
       group = save_fold,
