@@ -6,6 +6,7 @@ return {
   },
   config = function()
     require("orgmode").setup {
+      -- win_split_mode = "vertical",
       org_agenda_files = "~/orgfiles/**",
       org_default_notes_file = "~/orgfiles/refile.org",
       org_todo_keywords = { "TODO(t)", "DOING(p)", "|", "DONE(d)", "REJECTED(r)" },
