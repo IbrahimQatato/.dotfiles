@@ -45,4 +45,6 @@ M.term = {
   },
 }
 
+M.mason = { pkgs = { "roslyn" } } -- override defaults for mason 
+
 return M

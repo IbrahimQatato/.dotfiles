@@ -5,7 +5,7 @@ local lspconfig = vim.lsp.config
 local util = require "lspconfig.util"
 
 -- EXAMPLE
-local servers = { "html", "cssls", "clangd", "pylsp", "prolog_ls", "hls", "jdtls" }
+local servers = { "html", "cssls", "clangd", "pylsp", "prolog_ls", "hls" } -- jdtls is started by nvim-jdtls in ftplugin/java.lua
 local nvlsp = require "nvchad.configs.lspconfig"
 
 -- lsps with default config

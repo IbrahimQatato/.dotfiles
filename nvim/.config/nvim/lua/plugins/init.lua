@@ -56,6 +56,7 @@ return {
         "vimdoc",
         "html",
         "css",
+        "java",
       },
     },
   },
@@ -116,9 +117,14 @@ return {
       }
     end,
   },
+  -- Java: jdtls is started from ftplugin/java.lua
+  {
+    "mfussenegger/nvim-jdtls",
+    ft = "java",
+  },
   {
     "mfussenegger/nvim-dap",
-    ft = { "python", "c", "cpp" },
+    ft = { "python", "c", "cpp", "java" },
     dependencies = {
       "nvim-neotest/nvim-nio",
       "rcarriga/nvim-dap-ui",
