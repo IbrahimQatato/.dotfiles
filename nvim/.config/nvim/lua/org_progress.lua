@@ -18,6 +18,10 @@ local cfg = {
   bar_width  = 10,
   name_width = 18,
   interval   = 15,
+  -- "hours": progress = completed :Effort: hours / total :Effort: hours
+  --          (falls back to counting tasks/checkboxes where there is no Effort)
+  -- "count": progress = done tasks + checkboxes / total
+  mode       = "hours",
   -- how many columns from the right edge to anchor the float
   right_pad  = 2,
   -- how many rows from the top to anchor the float
@@ -37,33 +41,59 @@ local cfg = {
 }
 
 -- ── embedded Python parser ────────────────────────────────────────────────────
--- Emits an ordered list of top-level items. Each item aggregates the task
--- keywords *and plain-list checkbox items* (- [ ] / - [X] / - [-]) of all its
--- descendants, and carries a list of branches (its level-2 children) that each
+-- Emits an ordered list of top-level items. Each item aggregates its
+-- descendants and carries a list of branches (its level-2 children) that each
 -- aggregate their own descendants.
---   [ { "name", done, todo, in_progress,
---       branches: [ { "name", done, todo, in_progress }, ... ] }, ... ]
-local PARSER_PY = [[
+--   [ { "name", done, todo, in_progress, eff_done, eff_total, clocked,
+--       branches: [ { same fields }, ... ] }, ... ]
+--
+-- Hours (minutes in the JSON) come from :Effort: and CLOCK: lines:
+--   * a heading's Effort counts only if no descendant has its own Effort
+--     (so a parent estimate isn't double-counted with its children's)
+--   * DONE-type keyword          -> the whole Effort is done
+--   * REJECTED                   -> left out entirely
+--   * otherwise                  -> max(checkbox fraction × Effort,
+--                                       clocked time incl. sub-headings),
+--                                   capped at Effort
+-- done/todo/in_progress keep the old keyword+checkbox counts and are used
+-- as a fallback when a node has no Effort at all.
+local PARSER_PY = [==[
 import sys, re, json
-DONE = {"DONE","FIXED","CLOSED","REJECTED"}
+from datetime import datetime
+DONE = {"DONE","FIXED","CLOSED"}
+SKIP = {"REJECTED"}
 PROG = {"PROGRESS","DOING","NEXT"}
 TODO = {"TODO","WAITING","HOLD"}
-ALL  = DONE | PROG | TODO
+ALL  = DONE | SKIP | PROG | TODO
 def clean(s):
     s = re.sub(r':\S+:\s*$', '', s)
     s = re.sub(r'\[#[A-Z]\]\s*', '', s)
     s = re.sub(r'<[^>]+>', '', s)
-    s = re.sub(r'\[\d+/\d+\]', '', s)
-    s = re.sub(r'\[\d+%\]', '', s)
+    s = re.sub(r'\[\d*/\d*\]', '', s)
+    s = re.sub(r'\[\d*%\]', '', s)
     return s.strip().rstrip(':').strip()
+def effort_minutes(v):
+    v = v.strip().lower()
+    m = re.fullmatch(r'(\d+):(\d{1,2})', v)
+    if m: return int(m.group(1)) * 60 + int(m.group(2))
+    total, found = 0.0, False
+    for num, unit in re.findall(r'(\d+(?:\.\d+)?)\s*(d|h|min|m)\b', v):
+        found = True
+        total += float(num) * {"d": 1440, "h": 60, "min": 1, "m": 1}[unit]
+    if found: return int(total)
+    try: return int(float(v))   # bare number = minutes (org default)
+    except ValueError: return 0
+TS = r'\[(\d{4}-\d{2}-\d{2})[^\]\d]*(\d{1,2}:\d{2})\]'
+def parse_ts(d, t):
+    return datetime.strptime(d + " " + t, "%Y-%m-%d %H:%M")
 def new(name):
-    return {"name": name, "done": 0, "todo": 0, "in_progress": 0, "branches": []}
+    return {"name": name, "done": 0, "todo": 0, "in_progress": 0,
+            "eff_done": 0, "eff_total": 0, "clocked": 0, "branches": []}
 def add_kw(node, kw):
-    if kw in DONE: node["done"] += 1
+    if kw in DONE or kw in SKIP: node["done"] += 1
     elif kw in PROG: node["in_progress"] += 1
     elif kw in TODO: node["todo"] += 1
 def add_cb(node, ch):
-    # org checkbox state: [X]/[x] done, [-] partial, [ ] not done
     if ch in ('x', 'X'): node["done"] += 1
     elif ch == '-': node["in_progress"] += 1
     else: node["todo"] += 1
@@ -73,19 +103,34 @@ def parse(path):
     except Exception as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return []
-    hre = re.compile(r'^(\*+)\s+(.*)$')
-    # plain-list checkbox items: bullet (-, +, or N. / N)) followed by [ ], [X], [-]
-    cbre = re.compile(r'^\s*(?:[-+]|\d+[.)])\s+\[([ xX-])\]')
-    tops, cur_top, cur_branch = [], None, None
+    hre   = re.compile(r'^(\*+)\s+(.*)$')
+    cbre  = re.compile(r'^\s*(?:[-+]|\d+[.)])\s+\[([ xX-])\]')
+    effre = re.compile(r'^\s*:Effort:\s*(.+?)\s*$', re.I)
+    clkre = re.compile(r'^\s*CLOCK:\s*' + TS + r'(?:--' + TS + r')?')
+    now = datetime.now()
+    tops, heads = [], []      # heads: every heading under a top
+    cur_top = cur_branch = cur = None
     for line in lines:
         m = hre.match(line)
         if not m:
+            if cur_top is None: continue
             cm = cbre.match(line)
-            if cm and cur_top is not None:
+            if cm:
                 ch = cm.group(1)
                 add_cb(cur_top, ch)
-                if cur_branch is not None:
-                    add_cb(cur_branch, ch)
+                if cur_branch is not None: add_cb(cur_branch, ch)
+                cur["cb_n"] += 1
+                cur["cb_done"] += 1 if ch in 'xX' else (0.5 if ch == '-' else 0)
+                continue
+            em = effre.match(line)
+            if em:
+                cur["effort"] = effort_minutes(em.group(1))
+                continue
+            km = clkre.match(line)
+            if km:
+                start = parse_ts(km.group(1), km.group(2))
+                end = parse_ts(km.group(3), km.group(4)) if km.group(3) else now
+                cur["clocked"] += max(0, int((end - start).total_seconds() // 60))
             continue
         lvl = len(m.group(1))
         rest = m.group(2)
@@ -94,34 +139,80 @@ def parse(path):
         if parts and parts[0].upper() in ALL:
             kw = parts[0].upper()
             rest = parts[1] if len(parts) > 1 else ''
+            # "DONE REJECTED ..." -> treat as rejected
+            p2 = rest.split(None, 1)
+            if p2 and p2[0].upper() in SKIP:
+                kw = p2[0].upper()
+                rest = p2[1] if len(p2) > 1 else ''
         title = clean(rest)
         if lvl == 1:
             cur_top = new(title or kw)
             tops.append(cur_top)
             cur_branch = None
-            add_kw(cur_top, kw)
+        elif cur_top is None:
             continue
-        if cur_top is None:
-            continue
-        if lvl == 2:
+        elif lvl == 2:
             cur_branch = new(title or kw)
             cur_top["branches"].append(cur_branch)
-            add_kw(cur_branch, kw)
-            add_kw(cur_top, kw)
-            continue
-        # lvl >= 3: aggregate into the enclosing branch (if any) and top
         add_kw(cur_top, kw)
-        if cur_branch is not None:
-            add_kw(cur_branch, kw)
+        if lvl >= 2 and cur_branch is not None: add_kw(cur_branch, kw)
+        cur = {"lvl": lvl, "kw": kw, "effort": 0, "clocked": 0,
+               "cb_n": 0, "cb_done": 0, "top": cur_top,
+               "branch": cur_branch if lvl >= 2 else None, "desc_eff": False}
+        heads.append(cur)
+    # mark headings that have a descendant with its own Effort, and roll
+    # clocked time up the tree (sub_clk = own + all descendants)
+    stack = []
+    for h in heads:
+        while stack and stack[-1]["lvl"] >= h["lvl"]: stack.pop()
+        h["sub_clk"] = h["clocked"]
+        for a in stack:
+            a["sub_clk"] += h["clocked"]
+            if h["effort"]: a["desc_eff"] = True
+        stack.append(h)
+    for h in heads:
+        targets = [h["top"]] + ([h["branch"]] if h["branch"] is not None else [])
+        for t in targets: t["clocked"] += h["clocked"]
+        e = h["effort"]
+        if not e or h["desc_eff"] or h["kw"] in SKIP: continue
+        if h["kw"] in DONE:
+            d = e
+        else:
+            frac = h["cb_done"] / h["cb_n"] if h["cb_n"] else 0
+            d = min(e, max(frac * e, h["sub_clk"]))
+        for t in targets:
+            t["eff_total"] += e
+            t["eff_done"]  += d
     return tops
 print(json.dumps(parse(sys.argv[1])))
-]]
+]==]
 
 -- ── helpers ───────────────────────────────────────────────────────────────────
+local function uses_hours(c)
+  return cfg.mode == "hours" and (c.eff_total or 0) > 0
+end
+
 local function pct(c)
+  if uses_hours(c) then
+    return c.eff_done / c.eff_total * 100
+  end
   local total = c.done + c.todo + c.in_progress
   if total == 0 then return -1 end
   return (c.done + 0.5 * c.in_progress) / total * 100
+end
+
+-- minutes -> "12.5" style hours
+local function hrs(min)
+  local h = min / 60
+  if h == math.floor(h) then return ("%d"):format(h) end
+  return ("%.1f"):format(h)
+end
+
+local function count_str(c)
+  if uses_hours(c) then
+    return ("%s/%sh"):format(hrs(c.eff_done), hrs(c.eff_total))
+  end
+  return ("%d/%d"):format(c.done, c.done + c.todo + c.in_progress)
 end
 
 local function make_bar(p, w)
@@ -168,8 +259,7 @@ local function build_content(tops)
     local p    = pct(c)
     local b    = make_bar(p, cfg.bar_width)
     local pstr = p >= 0 and ("%3.0f%%"):format(p) or " n/a"
-    local tot  = c.done + c.todo + c.in_progress
-    local cnt  = ("%d/%d"):format(c.done, tot)
+    local cnt  = count_str(c)
     push({
       prefix_seg,
       { fit(name, cfg.name_width) .. " ", cfg.hl.name        },
